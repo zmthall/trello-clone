@@ -27,7 +27,7 @@
               </div>
             </button>
             <div class="flex flex-col justify-between h-full">
-              <Draggable v-model="list.cards" group="cards" item-key="id">
+              <Draggable v-model="list.cards" group="cards" item-key="id" class="w-full h-full">
                 <template #item="{ element: card }">
                   <div
                     :class="[
