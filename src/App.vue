@@ -1,7 +1,7 @@
 <template>
-  <main class="p-5 font-sans">
-    <div class="flex gap-5 py-5 overflow-x-auto">
-      <Draggable v-model="filteredLists" group="lists" item-key="id" class="flex gap-4">
+  <main class="p-5 font-sans h-svh">
+    <div class="flex gap-5 py-5 overflow-x-auto h-full">
+      <Draggable v-model="filteredLists" group="lists" item-key="id" class="flex gap-4 h-max">
         <template #item="{ element: list, index }">
           <div
             class="bg-gray-100 p-3 rounded-lg min-w-[250px] max-w-[300px] flex flex-col relative"
@@ -68,20 +68,22 @@
         </template>
       </Draggable>
     </div>
-    <ModalDialog
-      :isOpen="isModalOpen"
-      @close="closeModal"
-      @save="saveCard"
-      :card="editingCard"
-      :mode="modalMode"
-    />
+    <Teleport to="body">
+      <CardInputModal
+        :isOpen="isModalOpen"
+        @close="closeModal"
+        @save="saveCard"
+        :card="editingCard"
+        :mode="modalMode"
+      />
+    </Teleport>
   </main>
 </template>
 
 <script setup lang="ts">
 import Draggable from 'vuedraggable';
 import { computed, ref, watch } from 'vue';
-import ModalDialog from './components/ModalDialog.vue';
+import CardInputModal from './components/CardInputModal.vue';
 import type { Card, List, ColorTypes } from './types.ts';
 import { Filter } from 'lucide-vue-next';
 
@@ -104,7 +106,6 @@ const openModal = (listIndex: number, card?: Card) => {
   editingListIndex.value = listIndex;
   editingCard.value = card === undefined ? null : card;
   isModalOpen.value = true;
-  console.log(card);
 };
 
 const colorTab = computed(() => {
@@ -148,7 +149,8 @@ const saveCard = (card: Card) => {
         (listCard) => listCard.id === card.id
       );
 
-      if (cardIndex !== -1) lists.value[editingListIndex.value].cards[cardIndex] = card;
+      if (cardIndex !== -1)
+        lists.value[editingListIndex.value].cards[cardIndex] = { ...card, lastEdited: new Date() };
     }
     closeModal();
   } else {
@@ -180,7 +182,8 @@ const lists = ref<List[]>([
         description: 'Description for Task 1',
         color: 'red',
         deadline: null,
-        tags: []
+        tags: [],
+        lastEdited: null
       },
       {
         id: 2,
@@ -188,7 +191,8 @@ const lists = ref<List[]>([
         description: 'Description for Task 2',
         color: 'purple',
         deadline: null,
-        tags: []
+        tags: [],
+        lastEdited: null
       }
     ],
     filterOpened: false
@@ -213,7 +217,8 @@ const lists = ref<List[]>([
           { color: 'green', description: 'text' },
           { color: 'orange', description: 'text' },
           { color: 'blue', description: 'text' }
-        ]
+        ],
+        lastEdited: null
       },
       {
         id: 4,
@@ -221,7 +226,8 @@ const lists = ref<List[]>([
         description: 'Description for Task 4',
         color: 'blue',
         deadline: null,
-        tags: []
+        tags: [],
+        lastEdited: null
       }
     ],
     filterOpened: false
@@ -236,7 +242,8 @@ const lists = ref<List[]>([
         description: 'Description for Task 5',
         color: 'yellow',
         deadline: null,
-        tags: []
+        tags: [],
+        lastEdited: null
       }
     ],
     filterOpened: false
